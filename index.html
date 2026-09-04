@@ -128,13 +128,14 @@ const sceneTemplates=[
   {title:'回身停住',desc:'先走动再突然停下回身，保留身体动势，适合街拍和旅行记录。',query:'回身 街拍 旅行人像 姿势'}
 ];
 const sceneSortWords={hot:'高赞 热门',latest:'最新 笔记',composition:'构图 机位'};
+let lastSceneSignature='';
 function xhsSearchUrl(query){return 'https://www.xiaohongshu.com/search_result?keyword='+encodeURIComponent(query)}
 function drawSceneCards(){
   const input=document.getElementById('sceneInput'), results=document.getElementById('sceneResults'), meta=document.getElementById('sceneMeta'), sort=document.getElementById('sceneSort');
   if(!input||!results)return;
   const place=input.value.trim();
   if(!place){meta.textContent='先输入一个景点，例如“故宫”或“外滩”，再开始抽卡。';results.innerHTML='';return}
-  const mode=sort.value, picked=[...sceneTemplates].sort(()=>Math.random()-.5).slice(0,5);
+  const mode=sort.value; let picked,signature,attempts=0; do{picked=[...sceneTemplates].sort(()=>Math.random()-.5).slice(0,5);signature=picked.map(item=>item.title).sort().join('|');attempts++}while(signature===lastSceneSignature&&attempts<10); lastSceneSignature=signature;
   meta.textContent='“'+place+'” · '+(sceneSortWords[mode]||sceneSortWords.hot)+' · 本次 5 张搜索卡';
   results.innerHTML=picked.map((item,index)=>{const query=place+' '+item.query+' '+sceneSortWords[mode];return '<article class="scene-card"><b>0'+(index+1)+' / 小红书搜索</b><h3>'+item.title+'</h3><p>'+item.desc+'</p><a href="'+xhsSearchUrl(query)+'" target="_blank" rel="noreferrer">打开「'+query+'」↗</a></article>'}).join('');
 }
